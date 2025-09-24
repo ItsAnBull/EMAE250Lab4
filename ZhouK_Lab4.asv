@@ -3,6 +3,8 @@ function output = ZhouK_Lab4(flag, func_ary, init_ary, epsilon)
 % set the flag variable
 first = true;
 
+% -------------------------------------------------------------------
+
 % Perform the false position algorithm
 if flag == 1
     
@@ -33,9 +35,7 @@ if flag == 1
 
     end
 
-    loop = 0;
-
-    while first || ((x_r - x_rold) / x_r) > epsilon
+    while first || abs(((x_r - x_rold) / x_r)) > epsilon
         
         % store the value of x_r from the previous iteration
         x_rold = x_r;
@@ -64,13 +64,33 @@ if flag == 1
     % assing the final answer to the output variable
     output = x_r;
 
+
+% -------------------------------------------------------------------
+
 % Perform the secant algorithm
 elseif flag == 2
 
+    % unpack the func_ary vector
+    f = func_ary;
+    
+    % unpack the init_ary vector
+    x_prev = init_ary(1);
 
+    % unpack the init_ary vector
+    x_curr = init_ary(2);
+
+    % calc
+    x_curr = x_curr - (f(x_curr) * (x_curr - x_prev))
+
+    while abs(((x_curr - x_rold) / x_curr)) > epsilon
+    end
+
+% -------------------------------------------------------------------
 
 % Apply the Mullers method
 elseif flag == 3
+
+% -------------------------------------------------------------------
 
 % Apply the modified secant method
 else
