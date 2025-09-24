@@ -24,16 +24,16 @@ if flag == 1
     if (f(x_r) * f(x_u) < 0)
 
         % the root is between x_r and x_u
-        x_l = x_r
+        x_l = x_r;
 
     else
 
         % the root is between x_l and x_r
-        x_u = x_r
+        x_u = x_r;
 
     end
 
-    while first || ((x_r - x_rold) / x_r) > epsilon
+    while first || abs(((x_r - x_rold) / x_r)) > epsilon
         
         % store the value of x_r from the previous iteration
         x_rold = x_r;
@@ -45,12 +45,12 @@ if flag == 1
         if (f(x_r) * f(x_u) < 0)
 
             % the root is between x_r and x_u
-            x_l = x_r
+            x_l = x_r;
 
         else
 
             % the root is between x_l and x_r
-            x_u = x_r
+            x_u = x_r;
 
         end
         
@@ -58,13 +58,14 @@ if flag == 1
         first = false;
 
     end
-
+    
+    % assing the final answer to the output variable
     output = x_r;
-
-
 
 % Perform the secant algorithm
 elseif flag == 2
+
+
 
 % Apply the Mullers method
 elseif flag == 3
