@@ -1,13 +1,13 @@
 function output = ZhouK_Lab4(flag, func_ary, init_ary, epsilon)
 
-% set the flag variable
-first = true;
-
 % -------------------------------------------------------------------
 
 % Perform the false position algorithm
 if flag == 1
     
+    % set the flag variable
+    first = true;
+
     % unpack the func_ary vector
     f = func_ary;
     
@@ -79,15 +79,6 @@ elseif flag == 2
 
     % unpack the init_ary vector
     x_curr = init_ary(2);
-    
-    % store the old value of x_curr
-    old_x_curr = x_curr;
-
-    % calculate the new approximation
-    x_curr = x_curr - (f(x_curr) * (x_curr - x_prev)) / (f(x_curr) - f(x_prev));
-
-    % store the new x_prev as the old x_curr
-    x_prev = old_x_curr;
 
     % begin iterating the algorithm
     while abs(((x_curr - x_prev) / x_curr)) > epsilon
@@ -110,6 +101,59 @@ elseif flag == 2
 
 % Apply the Mullers method
 elseif flag == 3
+
+    % set the flag variable
+    first = true;
+
+    % unpack the func_ary vector
+    f = func_ary;
+    
+    % unpack the init_ary vector
+    x_ante = init_ary(1);
+
+    % unpack the init_ary vector
+    x_prev = init_ary(2);
+
+    % unpack the init_ary vector
+    x_curr = init_ary(3);  
+
+    % begin iterating the algorithm
+    while first || abs(((x_curr - x_prev) / x_curr)) > epsilon
+
+        % calculate a and b, storing the result in a column vector
+        param_vec = inv([(x_prev - x_curr)^2 (x_prev - x_curr); (x_ante - x_curr)^2 (x_ante - x_curr)]) * [f(x_prev) - f(x_curr); f(x_ante) - f(x_curr)];
+
+        % define a
+        a = param_vec(1);
+
+        % define b
+        b = param_vec(2);
+
+        % define c
+        c = f(x_curr);
+
+        % calculate the two roots
+        roots_vec = [x_curr - (2*c) / (b + ((b^2) - (4*a*c))^0.5) x_curr - (2*c) / (b - ((b^2) - (4*a*c))^0.5)];
+
+        % select the correct root
+        if abs(roots_vec(1) - x_curr) <= abs(roots_vec(2) - x_curr)
+            x_next = roots_vec(1);
+        else
+            x_next = roots_vec(2);
+        end
+
+        % update variables ahead of the next iteration
+        x_ante = x_prev;
+        x_prev = x_curr;
+        x_curr = x_next;
+
+        % toggle the short circuit variable
+        first = false;
+
+    end
+
+    % passing the final answer to the output variable
+    output = x_curr;
 
 % -------------------------------------------------------------------
 
