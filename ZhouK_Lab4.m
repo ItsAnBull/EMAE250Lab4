@@ -1,45 +1,23 @@
 function output = ZhouK_Lab4(flag, func_ary, init_ary, epsilon)
 
-% -------------------------------------------------------------------
+switch flag
+    % -------------------------------------------------------------------
+    % Perform the false position algorithm
+    case 1
 
-% Perform the false position algorithm
-if flag == 1
-    
-    % set the flag variable
-    first = true;
+        % set the flag variable
+        first = true;
 
-    % unpack the func_ary vector
-    f = func_ary;
-    
-    % unpack the init_ary vector
-    x_l = init_ary(1);
+        % unpack the func_ary vector
+        f = func_ary;
 
-    % unpack the init_ary vector
-    x_u = init_ary(2);
+        % unpack the init_ary vector
+        x_l = init_ary(1);
 
-    % Perform the algorithm once before entering the while loop
+        % unpack the init_ary vector
+        x_u = init_ary(2);
 
-    % calculate the root of the approximate function
-    x_r = x_u - (f(x_u) * (x_u - x_l)) / (f(x_u) - f(x_l));
-
-    % calculate the new range of the root
-    if (f(x_r) * f(x_u) < 0)
-
-        % the root is between x_r and x_u
-        x_l = x_r;
-
-    else
-
-        % the root is between x_l and x_r
-        x_u = x_r;
-
-    end
-
-    % begin iterating the algorithm
-    while first || abs(((x_r - x_rold) / x_r)) > epsilon
-        
-        % store the value of x_r from the previous iteration
-        x_rold = x_r;
+        % Perform the algorithm once before entering the while loop
 
         % calculate the root of the approximate function
         x_r = x_u - (f(x_u) * (x_u - x_l)) / (f(x_u) - f(x_l));
@@ -56,109 +34,126 @@ if flag == 1
             x_u = x_r;
 
         end
-        
-        % close the short circuit variable
-        first = false;
 
-    end
-    
-    % passing the final answer to the output variable
-    output = x_r;
+        % begin iterating the algorithm
+        while first || abs(((x_r - x_rold) / x_r)) > epsilon
 
+            % store the value of x_r from the previous iteration
+            x_rold = x_r;
 
-% -------------------------------------------------------------------
+            % calculate the root of the approximate function
+            x_r = x_u - (f(x_u) * (x_u - x_l)) / (f(x_u) - f(x_l));
 
-% Perform the secant algorithm
-elseif flag == 2
+            % calculate the new range of the root
+            if (f(x_r) * f(x_u) < 0)
 
-    % unpack the func_ary vector
-    f = func_ary;
-    
-    % unpack the init_ary vector
-    x_prev = init_ary(1);
+                % the root is between x_r and x_u
+                x_l = x_r;
 
-    % unpack the init_ary vector
-    x_curr = init_ary(2);
+            else
 
-    % begin iterating the algorithm
-    while abs(((x_curr - x_prev) / x_curr)) > epsilon
+                % the root is between x_l and x_r
+                x_u = x_r;
 
-        % store the old value of x_curr
-        old_x_curr = x_curr;
+            end
 
-        % calculate the new approximation
-        x_curr = x_curr - (f(x_curr) * (x_curr - x_prev)) / (f(x_curr) - f(x_prev));
+            % close the short circuit variable
+            first = false;
 
-        % store the new x_prev as the old x_curr
-        x_prev = old_x_curr;
-
-    end
-    
-    % passing the final answer to the output variable
-    output = x_curr;
-
-% -------------------------------------------------------------------
-
-% Apply the Mullers method
-elseif flag == 3
-
-    % set the flag variable
-    first = true;
-
-    % unpack the func_ary vector
-    f = func_ary;
-    
-    % unpack the init_ary vector
-    x_ante = init_ary(1);
-
-    % unpack the init_ary vector
-    x_prev = init_ary(2);
-
-    % unpack the init_ary vector
-    x_curr = init_ary(3);  
-
-    % begin iterating the algorithm
-    while first || abs(((x_curr - x_prev) / x_curr)) > epsilon
-
-        % calculate a and b, storing the result in a column vector
-        param_vec = inv([(x_prev - x_curr)^2 (x_prev - x_curr); (x_ante - x_curr)^2 (x_ante - x_curr)]) * [f(x_prev) - f(x_curr); f(x_ante) - f(x_curr)];
-
-        % define a
-        a = param_vec(1);
-
-        % define b
-        b = param_vec(2);
-
-        % define c
-        c = f(x_curr);
-
-        % calculate the two roots
-        roots_vec = [x_curr - (2*c) / (b + ((b^2) - (4*a*c))^0.5) x_curr - (2*c) / (b - ((b^2) - (4*a*c))^0.5)];
-
-        % select the correct root
-        if abs(roots_vec(1) - x_curr) <= abs(roots_vec(2) - x_curr)
-            x_next = roots_vec(1);
-        else
-            x_next = roots_vec(2);
         end
 
-        % update variables ahead of the next iteration
-        x_ante = x_prev;
-        x_prev = x_curr;
-        x_curr = x_next;
+        % passing the final answer to the output variable
+        output = x_r;
 
-        % toggle the short circuit variable
-        first = false;
+    % -------------------------------------------------------------------
+    % Perform the secant algorithm
+    case 2
 
-    end
+        % unpack the func_ary vector
+        f = func_ary;
 
-    % passing the final answer to the output variable
-    output = x_curr;
+        % unpack the init_ary vector
+        x_prev = init_ary(1);
 
-% -------------------------------------------------------------------
+        % unpack the init_ary vector
+        x_curr = init_ary(2);
 
-% Apply the modified secant method
-else
+        % begin iterating the algorithm
+        while abs(((x_curr - x_prev) / x_curr)) > epsilon
 
+            % store the old value of x_curr
+            old_x_curr = x_curr;
+
+            % calculate the new approximation
+            x_curr = x_curr - (f(x_curr) * (x_curr - x_prev)) / (f(x_curr) - f(x_prev));
+
+            % store the new x_prev as the old x_curr
+            x_prev = old_x_curr;
+
+        end
+
+        % passing the final answer to the output variable
+        output = x_curr;
+
+    % -------------------------------------------------------------------
+    % Apply the Mullers method
+    case 3
+
+        % set the flag variable
+        first = true;
+
+        % unpack the func_ary vector
+        f = func_ary;
+
+        % unpack the init_ary vector
+        x_ante = init_ary(1);
+
+        % unpack the init_ary vector
+        x_prev = init_ary(2);
+
+        % unpack the init_ary vector
+        x_curr = init_ary(3);
+
+        % begin iterating the algorithm
+        while first || abs(((x_curr - x_prev) / x_curr)) > epsilon
+
+            % calculate a and b, storing the result in a column vector
+            param_vec = inv([(x_prev - x_curr)^2 (x_prev - x_curr); (x_ante - x_curr)^2 (x_ante - x_curr)]) * [f(x_prev) - f(x_curr); f(x_ante) - f(x_curr)];
+
+            % define a
+            a = param_vec(1);
+
+            % define b
+            b = param_vec(2);
+
+            % define c
+            c = f(x_curr);
+
+            % calculate the two roots
+            roots_vec = [x_curr - (2*c) / (b + ((b^2) - (4*a*c))^0.5) x_curr - (2*c) / (b - ((b^2) - (4*a*c))^0.5)];
+
+            % select the correct root
+            if abs(roots_vec(1) - x_curr) <= abs(roots_vec(2) - x_curr)
+                x_next = roots_vec(1);
+            else
+                x_next = roots_vec(2);
+            end
+
+            % update variables ahead of the next iteration
+            x_ante = x_prev;
+            x_prev = x_curr;
+            x_curr = x_next;
+
+            % toggle the short circuit variable
+            first = false;
+
+        end
+
+        % passing the final answer to the output variable
+        output = x_curr;
+        
+    % -------------------------------------------------------------------
+    % Apply the modified secant method
+    otherwise
 end
 
