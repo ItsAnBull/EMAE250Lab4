@@ -62,7 +62,7 @@ switch flag
 
         end
 
-        % passing the final answer to the output variable
+        % pass the final answer to the output variable
         output = x_r;
 
     % -------------------------------------------------------------------
@@ -92,7 +92,7 @@ switch flag
 
         end
 
-        % passing the final answer to the output variable
+        % pass the final answer to the output variable
         output = x_curr;
 
     % -------------------------------------------------------------------
@@ -118,7 +118,7 @@ switch flag
         while first || abs(((x_curr - x_prev) / x_curr)) > epsilon
 
             % calculate a and b, storing the result in a column vector
-            param_vec = inv([(x_prev - x_curr)^2 (x_prev - x_curr); (x_ante - x_curr)^2 (x_ante - x_curr)]) * [f(x_prev) - f(x_curr); f(x_ante) - f(x_curr)];
+            param_vec = [(x_prev - x_curr)^2 (x_prev - x_curr); (x_ante - x_curr)^2 (x_ante - x_curr)] \ [f(x_prev) - f(x_curr); f(x_ante) - f(x_curr)];
 
             % define a
             a = param_vec(1);
@@ -149,11 +149,82 @@ switch flag
 
         end
 
-        % passing the final answer to the output variable
+        % pass the final answer to the output variable
         output = x_curr;
-        
+
     % -------------------------------------------------------------------
     % Apply the modified secant method
     otherwise
+
+        % set the flag variable
+        converged = false;
+
+        % calculate the size of the array
+        grad_size = size(func_ary);
+        grad_size = grad_size(2);
+
+        % initialize the var_ary
+        var_ary = init_ary;
+
+        % initialize the gradient matrix
+        grad_mat = zeros(grad_size,grad_size);
+
+        % initialize delta
+        delt = 0.01;
+        
+        % begin iterating the algorithm
+        while ~converged
+
+            % iterate for each row of the gradient matrix
+            for row = 1:grad_size
+
+                % for a given row, use the corresponding function
+                f = func_ary{row};
+
+                % iterate for each column of the gradient matrix
+                for col = 1:grad_size
+
+                    % initiate the corresponding delta matrix
+                    delta_mat = ones(1,grad_size);
+                    delta_mat(1,col) = (1 + delt);
+
+                    % calculate the corresponding term of the gradient
+                    % matrix
+                    grad_mat(row,col) = (f(times(var_ary,delta_mat)) - f(var_ary)) / (var_ary(col) * delt);
+
+                end
+
+                % build the function output column vector
+                func_vec(row,1) = f(var_ary);
+
+            end
+
+            % calculate the new values of x1, x2, ... xn, storing them in a
+            % row vector
+            new_var_ary = transpose(var_ary) - (grad_mat \ func_vec);
+            new_var_ary = transpose(new_var_ary);
+
+            % calculate the value of epsilon for each value of x1, x2, ...
+            % xn
+            epsilon_ary = abs((new_var_ary - var_ary) ./ new_var_ary);
+
+            % epsilon_ary will be 1 (true) if all values of epsilon are less than
+            % the threshold, and 0 (false) when not all values of epsilon
+            % are less than the threshold
+            epislon_ary = epsilon_ary < epsilon;
+
+            % adjust the flag convergence variable accordingly
+            if epislon_ary
+                converged = true;
+            end
+
+            % update the new approximations for x1, x2, ... xn
+            var_ary = new_var_ary;
+
+        end
+
+        % pass the final answer to the output variable
+        output = transpose(var_ary);
+        
 end
 

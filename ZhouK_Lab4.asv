@@ -17,11 +17,28 @@ switch flag
         % unpack the init_ary vector
         x_u = init_ary(2);
 
+        % Perform the algorithm once before entering the while loop
+
+        % calculate the root of the approximate function
+        x_r = x_u - (f(x_u) * (x_u - x_l)) / (f(x_u) - f(x_l));
+
+        % calculate the new range of the root
+        if (f(x_r) * f(x_u) < 0)
+
+            % the root is between x_r and x_u
+            x_l = x_r;
+
+        else
+
+            % the root is between x_l and x_r
+            x_u = x_r;
+
+        end
+
         % begin iterating the algorithm
         while first || abs(((x_r - x_rold) / x_r)) > epsilon
 
             % store the value of x_r from the previous iteration
-            if ~first
             x_rold = x_r;
 
             % calculate the root of the approximate function
@@ -101,7 +118,7 @@ switch flag
         while first || abs(((x_curr - x_prev) / x_curr)) > epsilon
 
             % calculate a and b, storing the result in a column vector
-            param_vec = inv([(x_prev - x_curr)^2 (x_prev - x_curr); (x_ante - x_curr)^2 (x_ante - x_curr)]) * [f(x_prev) - f(x_curr); f(x_ante) - f(x_curr)];
+            param_vec = [(x_prev - x_curr)^2 (x_prev - x_curr); (x_ante - x_curr)^2 (x_ante - x_curr)] \ [f(x_prev) - f(x_curr); f(x_ante) - f(x_curr)];
 
             % define a
             a = param_vec(1);
@@ -138,5 +155,71 @@ switch flag
     % -------------------------------------------------------------------
     % Apply the modified secant method
     otherwise
+
+        % set the flag variable
+        converged = false;
+
+        % calculate the size of the array
+        grad_size = size(func_ary);
+        grad_size = grad_size(2);
+
+        % initialize the var_ary
+        var_ary = init_ary;
+
+        % initialize the gradient matrix
+        grad_mat = zeros(grad_size,grad_size);
+
+        % initialize delta
+        delt = 0.01;
+        
+        % begin iterating the algorithm
+        while ~converged
+
+            % iterate for each row of the gradient matrix
+            for row = 1:grad_size
+
+                % for a given row, use the corresponding function
+                f = func_ary{row};
+
+                % iterate for each column of the gradient matrix
+                for col = 1:grad_size
+
+                    % initiate the corresponding delta matrix
+                    delta_mat = ones(1,grad_size);
+                    delta_mat(1,col) = (1 + delt);
+
+                    % calculate the corresponding term of the gradient
+                    % matrix
+                    grad_mat(row,col) = (f(times(var_ary,delta_mat)) - f(var_ary)) / (var_ary(col) * delt);
+
+                end
+
+                % build the function output column vector
+                func_vec(row,1) = f(var_ary);
+
+            end
+
+            % calculate the new values of x1, x2, ... xn, storing them in a
+            % row vector
+            new_var_ary = transpose(var_ary) - (grad_mat \ func_vec);
+            new_var_ary = transpose(new_var_ary);
+
+            % calculate the value of epsilon for each value of x1, x2, ...
+            % xn
+            epsilon_ary = abs((new_var_ary - var_ary) ./ new_var_ary);
+
+            % 
+            epislon_ary = epsilon_ary < epsilon;
+
+            if epislon_ary
+                converged = true;
+            end
+
+            var_ary = new_var_ary;
+
+        end
+
+        output = transpose(var_ary);
+        
 end
 
